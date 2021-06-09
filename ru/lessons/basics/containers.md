@@ -191,36 +191,38 @@ ghci> twoTupleToThreeTuple True (1, 2, 3)
                   ...
 ```
 
-## Lists
+## Списки
 
-From a usability perspective, Lists solve the problem of extensibility that
-tuples face, but they can only contain one type (in other words they are
-homogeneous). Lists also have a special built in syntax.
+С точки зрения удобства использования списки решают проблему изменения длины
+контейнера, которая характерна для кортежей, но списки могут содержать только
+один тип (другими словами, они однородны). Списки также имеют специальный
+встроенный синтаксис.
 
 ```haskell
 ghci> [1,2,3,4]
 [1,2,3,4]
 ```
 
-### Inductive Types
+### Индуктивные типы
 
-Lists are also a first introduction to an "inductive" or "recursive" type. Here
-is an example that is identical to the Haskell implementation without the
-syntactic sugar.
+Списки начинают наше знакомство с «индуктивными» или «рекурсивными» типами.
+Посмотрим на код, который идентичен встроенной реализации Haskell, но без
+синтаксического сахара.
 
 ```haskell
 data List a = Nil | Cons a (List a)
 ```
 
-You can see that this type is recursive. `Nil` is the base case, and the `Cons`
-constructor joins an `a` and a recursive call to `List a`. You can also see why
-lists can only contain 1 type, because the `a` is threaded through the entire
-structure. In our definition we can replace `Nil` with the empty list `[]` and
-`Cons` with `:` to get back to the built-in syntax.
+Заметим, что этот тип рекурсивный: `Nil` это базовый случай, а конструктор
+`Cons` объединяет элемент `a` и рекурсивный вызов `List a`. Также понятно,
+почему списки могут содержать только 1 тип: элементы одного типа `a` наполняют
+всю структуру данных на каждом шаге рекурсии. Если в данном определении `Nil`
+заменить пустым списком `[]`, а `Cons` заменить `:`, то мы вернёмся к
+встроенному синтаксису.
 
-Here is a demonstration of the structure of lists using the built-in syntax,
-the `:` constructor syntax, and our hand rolled definition. All three examples
-are equivalent:
+Проведём демонстрацию списков с помощью встроенного синтаксиса, а также
+конструктора `:` и, наконец, нашего ручного определения. Все три примера
+эквивалентны:
 
 ```haskell
 ghci> [1,2,3,4]
@@ -231,45 +233,45 @@ ghci> Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil)))
 Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil)))
 ```
 
-### When to Use
+### Когда использовать
 
-Linked lists are an extremely common data structure in functional programming,
-this means you are going to see them everywhere in Haskell. They are generally
-the first container a Haskell programmer reaches for.  Because of slow append
-and relatively slow indexed access (𝛰(n) where n is the index) they are
-generally used in situations where you know you are going to have to iterate
-over the entire data set, or you want to preserve the order of elements.
+Связные списки — чрезвычайно распространенная структура данных в функциональном
+программировании, а значит вы встретите их повсюду в Haskell. Обычно списки это
+первый контейнер, к которому тянется программист на Haskell. Из-за медленной
+конкатенации и относительно медленного индексирования (𝛰 (n), где n это
+индекс), они используются в ситуациях, когда известно, что вам придется
+пройтись по всему набору данных, или необходимо сохранить порядок элементов.
 
-A great example of an abstract data structure for which a linked list is a good
-concrete implementation are stacks. This is because pushing and popping are
-𝛰(1).
+Отличный пример абстрактной структуры данных, для которой связный список хорошо
+подходит в качестве конкретной реализации, это стеки. Всё потому что `push` и
+`pop` имеют в таком случае сложность 𝛰 (1).
 
-A bad use case would be for a queue, where either enqueue or dequeue would be
-𝛰(n) depending on which side of the linked list you decide to insert into.
+Плохим вариантом использования списка будет очередь, где либо поставить в
+очередь, либо извлечь из очереди займёт 𝛰 (n) (в зависимости от того, с какой
+стороны связного списка вы решили добавлять элементы).
 
-A common real world example of where lists are used is database queries. A
-database query could return no results `[]`, or some `[entity..]`, and there is
-potentially an ordering to these results. The database library doesn't really
-care about indexed access, and so it leaves that consideration to the caller of
-the function.
+Распространенный реальный пример использования списков это запросы к базе
+данных в памяти. Запрос к такой базе может не вернуть результата `[]` или
+вернуть несколько потенциально упорядоченных результатов `[entity ..]`. Такая
+библиотека для баз данных не будет реализовывать доступ по индексу и оставит
+это на усмотрение клиента.
 
-### List Concatenation
+### Конкатенация списков
 
-List concatenation uses the `++` operator:
+Для конкатенации списков используется операция `++`:
 
 ```haskell
 ghci> [1, 2] ++ [3, 4, 1]
 [1, 2, 3, 4, 1]
 ```
 
-### Head / Tail
+### Голова и хвост
 
-When using lists, it is common to work with a list's head and tail. The head is
-the list's first element, while the tail is a list containing the remaining
-elements.
+При использовании списков обычно обрабатывают голову и хвост списка. Голова это
+первый элемент списка, а хвост это список всех остальных элементов.
 
-Haskell provides two helpful functions, `head` and `tail`, for working with
-these parts:
+Haskell предоставляет две полезные функции для работы с этими частями, `head` и
+`tail`:
 
 ```haskell
 ghci> head ["Orange", "Banana", "Apple"]
@@ -278,10 +280,10 @@ ghci> tail ["Orange", "Banana", "Apple"]
 ["Banana","Apple"]
 ```
 
-Unfortunately these functions reveal an ugly part of the language's base
-library; they may raise an exception, even when given an argument with the
-appropriate type. The cause of these exceptions is that they do not cover the
-full domain of possible inputs, so there is room for undefined behaviour.
+К сожалению, эти функции раскрывают неприглядную сторону стандартной библиотеки
+языка (`base`): голова и хвост могут вызвать исключение, даже если им передан
+аргумент нужного типа. Причина в том, что эти функции не покрывают всё
+множество возможных входов.
 
 ```haskell
 ghci> head []
