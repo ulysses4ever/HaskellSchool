@@ -292,20 +292,21 @@ ghci> tail []
 *** Exception: Prelude.tail: empty list
 ```
 
-We can use a common idiom in Haskell for covering partial functions in a safe
-way, the `Maybe` type. This allows us to say that unhandled inputs return a
-`Nothing`. Now the caller of this maybe-returning-function must handle the
-`Nothing` case, but in return they are not faced with a nasty runtime exception.
+В Haskell распространена идиома для безопасной работы с частичными функциями —
+тип `Maybe`. Он позволяет сказать, что необработанные входные данные приводят к
+значению `Nothing` на выходе. При таком подходе вызывающая сторона обязана
+обработать случай `Nothing`, но взамен мы получаем защиту от неприятной
+исключительной ситуации во время выполнения.
 
 ```haskell
 ghci> :i Maybe
 data Maybe a = Nothing | Just a   -- Defined in ‘GHC.Maybe’
 ...
 ```
-__Note__: `:i` in ghci will give you some information about the type, the first
-line is the implementation.
+__Замечание__: `:i` в GHCi предоставляет информацию о типе; первая строка это реализация.
 
-Now we can define a total head and tail function using pattern matching!
+Покажем как определить тотальную функцию головы и хвоста при помощи
+сопоставления с образцом и `Maybe`.
 
 ```haskell
 ghci> :{
@@ -326,11 +327,11 @@ Just ["Banana","Apple"]
 ghci> safeTail []
 Nothing
 ```
-__Note__: `:{` and `:}` allow you to write multiline definitions in ghci.
+__Замечание__: `:{` и `:}` позволяют писать многострочные определения в GHCi.
 
-Hooray! No more exceptions.
+Больше никаких исключений!
 
-Another way to ensures that `head` and `tail` are safe is the non-empty list:
+Другой способ обеспечить безопасность `head` и `tail` это тип непустого списка:
 
 ```haskell
 ghci> import Data.List.NonEmpty
@@ -338,14 +339,14 @@ ghci> :i NonEmpty
 data NonEmpty a = a .:| [a]
 ```
 
-From its definition we can see that `NonEmpty` requires the first element to be
-present. This symbol `:|` is a constructor just like `:`, in fact the definition of
-`NonEmpty` is identical to that of lists, except it omits the `[]` (Nil) case.
+Из определения видно, что `NonEmpty` требует наличия первого элемента. Символ
+`:|` является конструктором, аналогично `:`; фактически определение `NonEmpty`
+эквивалентно спискам но исключает случай пустого списка.
 
-This handles the partiality problem the exact opposite way as the
-`Maybe` solution. Instead of forcing the caller of the function to guard against
-the ill-defined case when handling the result of the function, it forces them to
-construct a valid input up front (when calling the function).
+Такое решение проблемы частичных функций прямо противоположно решению с
+`Maybe`. Вместо того, чтобы заставлять клиента функции защищаться от
+нежелательного случая при обработке её результата, мы заставляем предоставить
+изначально корректный вход (при вызове функции).
 
 ```haskell
 ghci> import Data.List.NonEmpty as NE
@@ -360,9 +361,9 @@ ghci> NE.head []
     ...
 ```
 
-Notice that this time the error is not a runtime exception but a type error, the
-compiler is telling us that we tried to use a (potentially empty) list rather
-than the required `NonEmpty` type.
+Обратите внимание, что на этот раз ошибка это не исключение времени выполнения,
+а ошибка типов; компилятор сообщает, что мы пытались использовать
+(потенциально пустой) список, а не требуемый тип `NonEmpty`.
 
 ### List Performance
 
