@@ -365,31 +365,30 @@ ghci> NE.head []
 а ошибка типов; компилятор сообщает, что мы пытались использовать
 (потенциально пустой) список, а не требуемый тип `NonEmpty`.
 
-### List Performance
 
-Haskell implements lists as linked lists. The cons cells (the operator `:` is
-called cons, short for constructor) act as the links. This dictates which
-operations can be done quickly and which can be slow:
+### Производительность списков
 
-Prepending a value to a list is easy and fast - all we have to do is create a
-new cons cell with the element we want to prepend and point it to the existing
-list.
+Списки в Haskell реализованы как связные списки. Cons-ячейки (операция `:`
+называется cons от слова «конструктор») образуют цепочку. Это определяет,
+какие операции выполняются быстро, а какие медленно.
+
+Добавить значение в список легко и быстро: требуется только создать
+новую cons-ячейку с нужным элементом, и присоединить её к существующему списку.
 
 ```haskell
 prepend value list = value : list
 ```
 
-On the other hand, since the list data type (as shown above) can be either
-empty (`[]` or `Nil`) or a cons cell that will point to the rest of the list,
-it does not contain information about the length of the list, or a reference to
-the end of the list.
+С другой стороны, поскольку список (как показано выше) либо
+пуст (`[]` или `Nil`) либо представлен cons-ячейкой с ссылкой на хвост списка,
+он не содержит информации о своей длине или ссылки на
+последний элемент списка. Потому, чтобы получить длину списка, требуется пройти
+по каждой cons-ячейке до последней и посчитать их количество. Чтобы найти
+значение по определенному индексу, нужно пройти по списку, пока не достигнута
+нужная ячейка.
 
-Because of that, in order to retrieve the length of a list we must walk
-each cons cell and count until we reach the end of the list. To find the
-value at a specific index we need to traverse the list until we reach it.
-
-Similarly, in order to append a list to an existing list, we need to go to the
-end of the existing list, and add a cons cell that points to the new list:
+Аналогично, чтобы присоединить один список к другому, следует переместиться к
+концу первого списка и добавить cons-ячейку, указывающую на второй список:
 
 ```haskell
 append originalList newList =
@@ -398,14 +397,14 @@ append originalList newList =
         x : xs -> x : append xs newList
 ```
 
-The append function defined here is really the same as the `++` operator, as you
-might have deduced we need to be careful when using list append. Particularly
-`++` inside of loops has quadratic performance!
+Определенная здесь функция `append` на самом деле не отличается от операции
+`++`, и, как можно догадаться, использовать последнюю нужно с осторожностью. В
+частности, применение `++` внутри циклов приводит к квадратичной сложности!
 
-By virtue of the linked list data structure, many list operations run in linear
-time (`𝛰(n)`). In many cases the same operation is significantly slower for
-lists than for other containers, this is a great reason to be familiar with each
-and their tradeoffs!
+Как следствие структуры связного списка, многие операции со списками 
+выполняются за линейное время (`𝛰 (n)`). Во многих случаях одна и та же операция
+выполняется значительно медленнее для списков, чем для других контейнеров. 
+Это отличный повод познакомиться с каждой из альтернатив!
 
 ## Assoc lists
 
